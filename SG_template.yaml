@@ -18,4 +18,9 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-
+Outputs:
+  SecurityGroupId:
+    Description: The ID of the created Security Group
+    Value: !Ref MySecurityGroup
+    Export:
+      Name: MySecurityGroupId

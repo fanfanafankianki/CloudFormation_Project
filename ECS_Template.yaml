@@ -1,0 +1,141 @@
+Resources:
+  AppCluster:
+    Type: AWS::ECS::Cluster
+
+  UbuntuTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: UbuntuContainer
+      RequiresCompatibilities:
+        - EC2
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+        - Name: UbuntuContainer
+          Image: ubuntu:latest
+          PortMappings:
+            - ContainerPort: 80
+          Essential: true
+          Environment:
+            - Name: MARIADB_PORT
+              Value: "3306"
+            - Name: MEMCACHED_PORT
+              Value: "11211"
+          Essential: true
+
+  MariaDBTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: MariaDBContainer
+      RequiresCompatibilities:
+        - EC2
+      Cpu: 256
+      Memory: 512   
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+        - Name: MariaDBContainer
+          Image: mariadb:latest
+          PortMappings:
+            - ContainerPort: 3306
+          Environment:
+            - Name: MYSQL_ROOT_PASSWORD
+              Value: your_root_password
+            - Name: MYSQL_DATABASE
+              Value: your_database_name
+            - Name: MYSQL_USER
+              Value: your_database_user
+            - Name: MYSQL_PASSWORD
+              Value: your_database_password
+          Command:
+            - "/bin/bash"
+            - "-c"
+          Essential: true
+
+  MemcachedTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: MemcachedContainer
+      RequiresCompatibilities:
+        - EC2
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+        - Name: MemcachedContainer
+          Image: memcached:latest
+          Command:
+            - "/bin/bash"
+            - "-c"
+          PortMappings:
+            - ContainerPort: 11211
+          Essential: true
+
+  UbuntuService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: UbuntuService
+      Cluster: !Ref AppCluster
+      LaunchType: FARGATE
+      TaskDefinition: !Ref UbuntuTaskDefinition
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - Fn::ImportValue: MyPublicSubnet1Id
+          SecurityGroups:
+            - Fn::ImportValue: MySecurityGroupId
+
+  MariaDBService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: MariaDBService
+      Cluster: !Ref AppCluster
+      LaunchType: FARGATE
+      TaskDefinition: !Ref MariaDBTaskDefinition
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - Fn::ImportValue: MyPublicSubnet1Id
+          SecurityGroups:
+            - Fn::ImportValue: MySecurityGroupId
+
+  MemcachedService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: MemcachedService
+      Cluster: !Ref AppCluster
+      LaunchType: FARGATE
+      TaskDefinition: !Ref MemcachedTaskDefinition
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - Fn::ImportValue: MyPublicSubnet1Id
+          SecurityGroups:
+            - Fn::ImportValue: MySecurityGroupId
+
+Outputs:
+  ClusterService:
+    Description: The ID of the created Cluster Service
+    Value: !Ref AppCluster
+    Export:
+      Name: ClusterService
+  UbuntuService:
+    Description: The ID of the created Ubuntu Service
+    Value: !Ref UbuntuService
+    Export:
+      Name: UbuntuService
+
+  MariaDBService:
+    Description: The ID of the created MariaDB Service
+    Value: !Ref MariaDBService
+    Export:
+      Name: MariaDBService
+
+  MemcachedService:
+    Description: The ID of the created Memcached Service
+    Value: !Ref MemcachedService
+    Export:
+      Name: MemcachedService

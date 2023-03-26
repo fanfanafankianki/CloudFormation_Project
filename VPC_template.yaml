@@ -117,3 +117,27 @@ Outputs:
     Description: "The ID of the VPC created by this CloudFormation stack."
     Export:
       Name: MyVPCId
+      
+  MyPublicSubnet1Id:
+    Value: !Ref MyPublicSubnet1
+    Description: "The ID of the public subnet 1."
+    Export:
+      Name: MyPublicSubnet1Id
+
+  MyPublicSubnet2Id:
+    Value: !Ref MyPublicSubnet2
+    Description: "The ID of the public subnet 2."
+    Export:
+      Name: MyPublicSubnet2Id
+
+  MyPrivateSubnet1Id:
+    Value: !Ref MyPrivateSubnet1
+    Description: "The ID of the private subnet 1."
+    Export:
+      Name: MyPrivateSubnet1Id
+
+  MyPrivateSubnet2Id:
+    Value: !Ref MyPrivateSubnet2
+    Description: "The ID of the private subnet 2."
+    Export:
+      Name: MyPrivateSubnet2Id
