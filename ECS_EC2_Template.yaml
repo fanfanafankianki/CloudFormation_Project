@@ -1,0 +1,24 @@
+Resources:
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0cc4e06e6e710cd94
+      InstanceType: t2.micro
+      IamInstanceProfile: arn:aws:iam::320442627588:instance-profile/Admin
+      SecurityGroups:
+        - Fn::ImportValue: MySecurityGroupId
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          echo ECS_CLUSTER=ecste-AppCluster-r55VmOi9cD9M >> /etc/ecs/ecs.config
+          systemctl enable --now ecs
+
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - Fn::ImportValue: MyPublicSubnet1Id
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      MinSize: 1
+      MaxSize: 3
+      DesiredCapacity: 1
