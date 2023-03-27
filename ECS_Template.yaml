@@ -104,10 +104,34 @@ Resources:
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: MemcachedContainer
-          Image: 320442627588.dkr.ecr.eu-west-1.amazonaws.com/projectrepository:latest
+          Image: memcached:latest
           PortMappings:
             - ContainerPort: 11211
+          Environment:
+            - Name: MEMCACHED_MEMORY_LIMIT
+              Value: "64"
+            - Name: MEMCACHED_MAX_CONNECTIONS
+              Value: "1024"
+            - Name: MEMCACHED_THREADS
+              Value: "4"
+            - Name: MEMCACHED_LISTEN_IP
+              Value: "0.0.0.0"
+            - Name: MEMCACHED_LISTEN_PORT
+              Value: "11211"
+          Command:
+            - "memcached"
+            - "-m"
+            - "$(MEMCACHED_MEMORY_LIMIT)"
+            - "-c"
+            - "$(MEMCACHED_MAX_CONNECTIONS)"
+            - "-t"
+            - "$(MEMCACHED_THREADS)"
+            - "-l"
+            - "$(MEMCACHED_LISTEN_IP)"
+            - "-p"
+            - "$(MEMCACHED_LISTEN_PORT)"
           Essential: true
+
 
   UbuntuService:
     Type: AWS::ECS::Service
@@ -176,7 +200,7 @@ Resources:
   MyCapacityProvider:
     Type: "AWS::ECS::CapacityProvider"
     Properties:
-      Name: MyCustomCapacityProvider
+      Name: MyCustomCapacityProvider    
       AutoScalingGroupProvider:
         AutoScalingGroupArn: !Ref AutoScalingGroup
         ManagedScaling:

@@ -1,0 +1,62 @@
+Resources:
+  MySecurityGroupJenkins:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "My CloudFormation SG"
+      VpcId:
+        Fn::ImportValue: MyVPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.small
+      ImageId: ami-0cc4e06e6e710cd94
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt install -y openjdk-11-jdk 
+          sudo apt install maven -y 
+          
+          curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
+          /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+          echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+          /etc/apt/sources.list.d/jenkins.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install jenkins -y 
+  
+
+      Tags:
+        - Key: "Name"
+          Value: "JenkinsEC2Project"
+      KeyName: "CloudStackKey"
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          DeleteOnTermination: true
+          SubnetId:
+            Fn::ImportValue: MyPublicSubnet1Id
+          GroupSet:
+            - !Ref MySecurityGroupJenkins
+      AvailabilityZone: "eu-west-1a"
+      
+Outputs:
+  SecurityGroupId:
+    Description: The ID of the created JenkinsSecurity Group
+    Value: !Ref MySecurityGroupJenkins
+    Export:
+      Name: MySecurityGroupJenkins
