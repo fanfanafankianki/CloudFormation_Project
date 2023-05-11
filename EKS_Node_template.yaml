@@ -1,18 +1,18 @@
 Resources:
   MyNodeGroup:
-    Type: "AWS::EKS::Nodegroup"
+    Type: AWS::EKS::Nodegroup
     Properties:
-      ClusterName: "production-pwrtrckr"
-      NodegroupName: "my-eks-node-group"
+      ClusterName: production-pwrtrckr
+      NodegroupName: my-eks-node-group
       ScalingConfig:
         DesiredSize: 2
         MaxSize: 3
         MinSize: 1
       Subnets:
+        - Fn::ImportValue: MyPrivateSubnet1Id      
         - Fn::ImportValue: MyPublicSubnet1Id
-        - Fn::ImportValue: MyPrivateSubnet1Id
+        - Fn::ImportValue: MyPrivateSubnet2Id    
         - Fn::ImportValue: MyPublicSubnet2Id
-        - Fn::ImportValue: MyPrivateSubnet2Id          
       InstanceTypes:
-        - "t2.small"
-      NodeRole: "arn:aws:iam::320442627588:role/EKSNODEGROUP"
+        - t2.small
+      NodeRole: arn:aws:iam::320442627588:role/EKSNODEGROUP

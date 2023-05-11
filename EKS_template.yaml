@@ -6,10 +6,10 @@ Resources:
       RoleArn: arn:aws:iam::320442627588:role/AWsEKSClusterRole
       ResourcesVpcConfig:
         SubnetIds:
+          - Fn::ImportValue: MyPrivateSubnet1Id      
           - Fn::ImportValue: MyPublicSubnet1Id
-          - Fn::ImportValue: MyPrivateSubnet1Id
-          - Fn::ImportValue: MyPublicSubnet2Id
-          - Fn::ImportValue: MyPrivateSubnet2Id         
+          - Fn::ImportValue: MyPrivateSubnet2Id    
+          - Fn::ImportValue: MyPublicSubnet2Id         
         SecurityGroupIds:
           - Fn::ImportValue: MySecurityGroupId
       Version: "1.26"
