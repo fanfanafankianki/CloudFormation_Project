@@ -8,10 +8,8 @@ Resources:
         DesiredSize: 2
         MaxSize: 3
         MinSize: 1
-      Subnets:
-        - Fn::ImportValue: MyPrivateSubnet1Id      
+      Subnets:      
         - Fn::ImportValue: MyPublicSubnet1Id
-        - Fn::ImportValue: MyPrivateSubnet2Id    
         - Fn::ImportValue: MyPublicSubnet2Id
       InstanceTypes:
         - t2.small
